@@ -1,0 +1,85 @@
+/*
+ * Datenexplorer-Lader: ersetzt den Platzhalter [data-datenexplorer] durch die
+ * eingebettete htmlwidgets-App. Die Einbettungsdatei (JSON) liegt bei der App:
+ *   { "css": ["lib/…css"], "js": ["lib/…js"], "html": "<div id=…>…</div>" }
+ * Pfade darin sind relativ zur App-Adresse (data-quelle).
+ */
+(function () {
+  'use strict';
+
+  function ladeSkript(src) {
+    return new Promise(function (ok, fehler) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.async = false;
+      s.onload = function () { ok(); };
+      s.onerror = function () { fehler(new Error('Skript nicht geladen: ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function ladeCss(href) {
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href;
+    document.head.appendChild(l);
+  }
+
+  function fehlerAnzeigen(el, basis) {
+    var status = el.querySelector('.datenexplorer-status');
+    if (!status) {
+      status = document.createElement('p');
+      status.className = 'datenexplorer-status';
+      el.appendChild(status);
+    }
+    status.textContent = 'Die interaktive Ansicht konnte nicht geladen werden. ';
+    var a = document.createElement('a');
+    a.href = basis;
+    a.textContent = 'In eigenem Fenster öffnen';
+    status.appendChild(a);
+  }
+
+  function starte(el) {
+    var basis = el.getAttribute('data-quelle') || '';
+    if (basis && !/\/$/.test(basis)) basis += '/';
+    var datei = el.getAttribute('data-einbettung') || 'Datenexplorer_einbettung.json';
+    // Fuer die App: Adresse fuer nachgeladene Dateien, Einbettungsmodus
+    window.GW_DATENEXPLORER_BASIS = basis;
+    window.GW_DATENEXPLORER_EINGEBETTET = true;
+
+    fetch(new URL(datei, basis).href, { cache: 'no-cache' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Einbettung nicht gefunden (' + r.status + ')');
+        return r.json();
+      })
+      .then(function (b) {
+        (b.css || []).forEach(function (c) { ladeCss(new URL(c, basis).href); });
+        var huelle = document.createElement('div');
+        huelle.className = 'datenexplorer-app';
+        huelle.hidden = true;
+        huelle.innerHTML = b.html || '';
+        el.appendChild(huelle);
+        return (b.js || []).reduce(function (kette, src) {
+          return kette.then(function () { return ladeSkript(new URL(src, basis).href); });
+        }, Promise.resolve()).then(function () { return huelle; });
+      })
+      .then(function (huelle) {
+        Array.prototype.slice.call(el.children).forEach(function (k) { if (k !== huelle) k.remove(); });
+        huelle.hidden = false;
+        el.classList.add('datenexplorer--bereit');
+        if (window.HTMLWidgets && window.HTMLWidgets.staticRender) window.HTMLWidgets.staticRender();
+      })
+      .catch(function (err) {
+        console.error('Datenexplorer:', err);
+        fehlerAnzeigen(el, basis);
+      });
+  }
+
+  function init() {
+    var el = document.querySelector('[data-datenexplorer]');
+    if (el) starte(el);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();

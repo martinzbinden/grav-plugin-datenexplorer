@@ -1,0 +1,44 @@
+name: Datenexplorer
+slug: datenexplorer
+type: plugin
+version: 1.0.0
+description: 'Bettet eine mit R/htmlwidgets erzeugte Web-App (z.B. Plotly-Datenexplorer) ohne iframe in eine Seite ein – im Seitenrahmen und Stil der Website. Im Inhalt genügt [datenexplorer].'
+icon: line-chart
+author:
+  name: Martin Zbinden
+license: MIT
+
+form:
+  validation: loose
+  fields:
+    enabled:
+      type: toggle
+      label: Plugin aktiv
+      highlight: 1
+      default: 1
+      options: { 1: Ja, 0: Nein }
+      validate: { type: bool }
+    quelle:
+      type: url
+      label: Adresse der App
+      placeholder: 'https://apps.example.ch/explorer/'
+      help: 'Ordner, in dem die Einbettungsdatei, lib/ und die nachgeladenen Dateien liegen. Muss JSON mit CORS-Kopfzeile ausliefern.'
+    einbettung:
+      type: text
+      label: Einbettungsdatei
+      default: Datenexplorer_einbettung.json
+    vorschaubild:
+      type: text
+      label: Vorschaubild (relativ zur Adresse)
+      help: 'Wird angezeigt, solange die App lädt, z.B. eine statische Karte.'
+    vorschaubild_alt:
+      type: text
+      label: Alternativtext des Vorschaubilds
+    text_laden:
+      type: text
+      label: Text während des Ladens
+      default: 'Interaktive Ansicht wird geladen …'
+    text_fenster:
+      type: text
+      label: 'Linktext „In eigenem Fenster öffnen“'
+      default: 'In eigenem Fenster öffnen'

@@ -1,0 +1,87 @@
+<?php
+namespace Grav\Plugin;
+
+use Grav\Common\Plugin;
+use RocketTheme\Toolbox\Event\Event;
+
+/**
+ * Datenexplorer: bettet eine mit R/htmlwidgets erzeugte Web-App (z.B. den
+ * Graswachstum-Datenexplorer) direkt in eine Grav-Seite ein - ohne iframe,
+ * im Seitenrahmen und Stil der Website.
+ *
+ * Im Seiteninhalt genügt die Marke [datenexplorer]. Sie wird durch einen
+ * Platzhalter ersetzt (statisches Vorschaubild), den das Skript
+ * assets/datenexplorer.js durch die App ersetzt: es lädt
+ * <quelle>/<einbettung> (JSON mit css, js und html, siehe README), setzt
+ * Stylesheets und HTML ein, lädt die Skripte und startet die Widgets.
+ */
+class DatenexplorerPlugin extends Plugin
+{
+    private const MARKE = '[datenexplorer]';
+
+    public static function getSubscribedEvents(): array
+    {
+        return ['onPluginsInitialized' => ['onPluginsInitialized', 0]];
+    }
+
+    public function onPluginsInitialized(): void
+    {
+        if ($this->isAdmin()) {
+            return;
+        }
+        $this->enable([
+            'onPageContentProcessed' => ['onPageContentProcessed', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
+        ]);
+    }
+
+    private function cfg(string $k, $d = null)
+    {
+        return $this->config->get('plugins.datenexplorer.' . $k, $d);
+    }
+
+    /** Marke durch den Platzhalter ersetzen (das Ergebnis landet im Seiten-Cache) */
+    public function onPageContentProcessed(Event $event): void
+    {
+        $page = $event['page'];
+        $content = $page->getRawContent();
+        if (strpos($content, self::MARKE) === false) {
+            return;
+        }
+        // Von Markdown in <p> gepackte Marke mitsamt Absatz ersetzen
+        $html = $this->platzhalter();
+        $content = preg_replace('#<p>\s*' . preg_quote(self::MARKE, '#') . '\s*</p>#', $html, $content);
+        $content = str_replace(self::MARKE, $html, $content);
+        $page->setRawContent($content);
+    }
+
+    private function platzhalter(): string
+    {
+        $quelle = rtrim((string) $this->cfg('quelle', ''), '/') . '/';
+        $e = static fn($s) => htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
+        $bild = (string) $this->cfg('vorschaubild', '');
+        $bildHtml = $bild !== ''
+            ? '<img class="datenexplorer-vorschau" src="' . $e($quelle . $bild) . '" alt="' . $e($this->cfg('vorschaubild_alt', '')) . '">'
+            : '';
+        return '<div class="datenexplorer not-prose" data-datenexplorer'
+            . ' data-quelle="' . $e($quelle) . '"'
+            . ' data-einbettung="' . $e($this->cfg('einbettung', 'Datenexplorer_einbettung.json')) . '">'
+            . $bildHtml
+            . '<p class="datenexplorer-status" role="status"><span class="datenexplorer-lader" aria-hidden="true"></span>'
+            . $e($this->cfg('text_laden', 'Interaktive Ansicht wird geladen …')) . '</p>'
+            . '<noscript><p><a href="' . $e($quelle) . '">' . $e($this->cfg('text_fenster', 'In eigenem Fenster öffnen')) . '</a></p></noscript>'
+            . '</div>';
+    }
+
+    /** Skript und Stil nur auf Seiten mit Datenexplorer laden */
+    public function onTwigSiteVariables(): void
+    {
+        $page = $this->grav['page'] ?? null;
+        if (!$page || strpos((string) $page->content(), 'data-datenexplorer') === false) {
+            return;
+        }
+        $assets = $this->grav['assets'];
+        $assets->addCss('plugin://datenexplorer/assets/datenexplorer.css');
+        $assets->addJs('plugin://datenexplorer/assets/datenexplorer.js', ['group' => 'bottom', 'loading' => 'defer']);
+    }
+}

@@ -1,0 +1,22 @@
+/* Platzhalter, bis die App geladen ist */
+.datenexplorer { position: relative; margin: 1.5rem 0; }
+.datenexplorer-vorschau { display: block; width: 100%; height: auto; border-radius: 8px; opacity: 0.55; }
+.datenexplorer-status { display: flex; align-items: center; gap: 0.6rem; margin: 0.75rem 0 0; font-size: 0.9rem; color: #555; }
+.datenexplorer-lader { width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: datenexplorer-dreh 0.8s linear infinite; }
+@keyframes datenexplorer-dreh { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .datenexplorer-lader { animation: none; } }
+
+/* Die App bringt ihr eigenes Layout mit: Basis-Stile des Themes (Tailwind
+   Preflight, Typography) zuruecknehmen, wo sie Plotly/Formulare stoeren */
+.datenexplorer-app { color: #222; line-height: normal; }
+.datenexplorer-app svg, .datenexplorer-app img, .datenexplorer-app canvas { max-width: none; vertical-align: baseline; }
+.datenexplorer-app .js-plotly-plot svg { display: inline; }
+.datenexplorer-app .js-plotly-plot .main-svg { position: absolute; }
+.datenexplorer-app input[type="radio"], .datenexplorer-app input[type="checkbox"] { appearance: auto; }
+.datenexplorer-app input[type="text"], .datenexplorer-app input[type="search"] { border: 1px solid #bbb; border-radius: 6px; padding: 6px 8px; background: white; }
+.datenexplorer-app button { line-height: 1.2; }
+
+@media (max-width: 700px) {
+  /* Auf dem Handy randlos bis an den Bildschirmrand */
+  .datenexplorer { margin-left: -1rem; margin-right: -1rem; }
+}

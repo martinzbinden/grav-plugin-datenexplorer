@@ -47,11 +47,21 @@
     window.GW_DATENEXPLORER_BASIS = basis;
     window.GW_DATENEXPLORER_EINGEBETTET = true;
 
-    fetch(new URL(datei, basis).href, { cache: 'no-cache' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('Einbettung nicht gefunden (' + r.status + ')');
-        return r.json();
-      })
+    // Einmal wiederholen: ein abgebrochener erster Verbindungsaufbau soll
+    // nicht gleich die Fehlermeldung zeigen.
+    function holeEinbettung(versuch) {
+      return fetch(new URL(datei, basis).href, { cache: 'no-cache' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('Einbettung nicht gefunden (' + r.status + ')');
+          return r.json();
+        })
+        .catch(function (err) {
+          if (versuch > 0) throw err;
+          return new Promise(function (ok) { setTimeout(ok, 1500); }).then(function () { return holeEinbettung(1); });
+        });
+    }
+
+    holeEinbettung(0)
       .then(function (b) {
         (b.css || []).forEach(function (c) { ladeCss(new URL(c, basis).href); });
         var huelle = document.createElement('div');

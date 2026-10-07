@@ -55,6 +55,13 @@ class DatenexplorerPlugin extends Plugin
         $page->setRawContent($content);
     }
 
+    /** Text aus der Konfiguration, sonst aus languages.yaml in der Seitensprache */
+    private function text(string $cfgKey, string $langKey): string
+    {
+        $t = (string) $this->cfg($cfgKey, '');
+        return $t !== '' ? $t : (string) $this->grav['language']->translate(['PLUGIN_DATENEXPLORER.' . $langKey]);
+    }
+
     private function platzhalter(): string
     {
         $quelle = rtrim((string) $this->cfg('quelle', ''), '/') . '/';
@@ -65,11 +72,13 @@ class DatenexplorerPlugin extends Plugin
             : '';
         return '<div class="datenexplorer not-prose" data-datenexplorer'
             . ' data-quelle="' . $e($quelle) . '"'
-            . ' data-einbettung="' . $e($this->cfg('einbettung', 'Datenexplorer_einbettung.json')) . '">'
+            . ' data-einbettung="' . $e($this->cfg('einbettung', 'Datenexplorer_einbettung.json')) . '"'
+            . ' data-text-fehler="' . $e($this->text('text_fehler', 'FEHLER')) . '"'
+            . ' data-text-fenster="' . $e($this->text('text_fenster', 'FENSTER')) . '">'
             . $bildHtml
             . '<p class="datenexplorer-status" role="status"><span class="datenexplorer-lader" aria-hidden="true"></span>'
-            . $e($this->cfg('text_laden', 'Interaktive Ansicht wird geladen …')) . '</p>'
-            . '<noscript><p><a href="' . $e($quelle) . '">' . $e($this->cfg('text_fenster', 'In eigenem Fenster öffnen')) . '</a></p></noscript>'
+            . $e($this->text('text_laden', 'LADEN')) . '</p>'
+            . '<noscript><p><a href="' . $e($quelle) . '">' . $e($this->text('text_fenster', 'FENSTER')) . '</a></p></noscript>'
             . '</div>';
     }
 

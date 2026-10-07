@@ -34,11 +34,16 @@ form:
     vorschaubild_alt:
       type: text
       label: Alternativtext des Vorschaubilds
+    texte_titel:
+      type: section
+      title: Texte
+      text: 'Leer lassen für die mitgelieferten Übersetzungen in der Seitensprache (de, fr, it, en).'
     text_laden:
       type: text
       label: Text während des Ladens
-      default: 'Interaktive Ansicht wird geladen …'
     text_fenster:
       type: text
       label: 'Linktext „In eigenem Fenster öffnen“'
-      default: 'In eigenem Fenster öffnen'
+    text_fehler:
+      type: text
+      label: Fehlermeldung

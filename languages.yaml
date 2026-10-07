@@ -1,0 +1,20 @@
+de:
+  PLUGIN_DATENEXPLORER:
+    LADEN: 'Interaktive Ansicht wird geladen …'
+    FENSTER: 'In eigenem Fenster öffnen'
+    FEHLER: 'Die interaktive Ansicht konnte nicht geladen werden.'
+fr:
+  PLUGIN_DATENEXPLORER:
+    LADEN: 'Chargement de la vue interactive …'
+    FENSTER: 'Ouvrir dans une nouvelle fenêtre'
+    FEHLER: 'La vue interactive n''a pas pu être chargée.'
+it:
+  PLUGIN_DATENEXPLORER:
+    LADEN: 'Caricamento della vista interattiva …'
+    FENSTER: 'Apri in una nuova finestra'
+    FEHLER: 'Non è stato possibile caricare la vista interattiva.'
+en:
+  PLUGIN_DATENEXPLORER:
+    LADEN: 'Loading interactive view …'
+    FENSTER: 'Open in a new window'
+    FEHLER: 'The interactive view could not be loaded.'

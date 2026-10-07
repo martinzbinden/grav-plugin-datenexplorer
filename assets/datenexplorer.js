@@ -32,10 +32,10 @@
       status.className = 'datenexplorer-status';
       el.appendChild(status);
     }
-    status.textContent = 'Die interaktive Ansicht konnte nicht geladen werden. ';
+    status.textContent = (el.getAttribute('data-text-fehler') || 'Die interaktive Ansicht konnte nicht geladen werden.') + ' ';
     var a = document.createElement('a');
     a.href = basis;
-    a.textContent = 'In eigenem Fenster öffnen';
+    a.textContent = el.getAttribute('data-text-fenster') || 'In eigenem Fenster öffnen';
     status.appendChild(a);
   }
 

@@ -70,7 +70,9 @@ class DatenexplorerPlugin extends Plugin
         $bildHtml = $bild !== ''
             ? '<img class="datenexplorer-vorschau" src="' . $e($quelle . $bild) . '" alt="' . $e($this->cfg('vorschaubild_alt', '')) . '">'
             : '';
-        return '<div class="datenexplorer not-prose" data-datenexplorer'
+        $abstand = trim((string) $this->cfg('abstand_oben', ''));
+        $stil = preg_match('/^-?[0-9.]+(px|rem|em)$/', $abstand) ? ' style="--datenexplorer-abstand-oben: ' . $abstand . '"' : '';
+        return '<div class="datenexplorer not-prose" data-datenexplorer' . $stil
             . ' data-quelle="' . $e($quelle) . '"'
             . ' data-einbettung="' . $e($this->cfg('einbettung', 'Datenexplorer_einbettung.json')) . '"'
             . ' data-text-fehler="' . $e($this->text('text_fehler', 'FEHLER')) . '"'
@@ -89,8 +91,11 @@ class DatenexplorerPlugin extends Plugin
         if (!$page || strpos((string) $page->content(), 'data-datenexplorer') === false) {
             return;
         }
+        // Version (Aenderungszeit) anhaengen, damit Browser nach einem Update
+        // nicht die alten Dateien aus dem Cache nehmen
+        $v = static fn(string $f) => '?v=' . (@filemtime(__DIR__ . '/assets/' . $f) ?: '1');
         $assets = $this->grav['assets'];
-        $assets->addCss('plugin://datenexplorer/assets/datenexplorer.css');
-        $assets->addJs('plugin://datenexplorer/assets/datenexplorer.js', ['group' => 'bottom', 'loading' => 'defer']);
+        $assets->addCss('plugin://datenexplorer/assets/datenexplorer.css' . $v('datenexplorer.css'));
+        $assets->addJs('plugin://datenexplorer/assets/datenexplorer.js' . $v('datenexplorer.js'), ['group' => 'bottom', 'loading' => 'defer']);
     }
 }

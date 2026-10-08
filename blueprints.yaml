@@ -34,6 +34,11 @@ form:
     vorschaubild_alt:
       type: text
       label: Alternativtext des Vorschaubilds
+    abstand_oben:
+      type: text
+      label: Abstand nach oben (ab Tabletbreite)
+      placeholder: '-3rem'
+      help: 'CSS-Länge in px, rem oder em; negativ, um ein grosses Innenpolster des Themes oberhalb der App auszugleichen.'
     texte_titel:
       type: section
       title: Texte

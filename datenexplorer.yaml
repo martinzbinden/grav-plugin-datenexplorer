@@ -5,6 +5,8 @@ einbettung: Datenexplorer_einbettung.json
 # Optionales Vorschaubild (relativ zur Quelle), solange die App laedt
 vorschaubild: ''
 vorschaubild_alt: ''
+# Abstand nach oben ab Tabletbreite (z.B. -3rem gegen grosses Theme-Polster)
+abstand_oben: ''
 # Leer = Texte aus languages.yaml in der Seitensprache (de, fr, it, en)
 text_laden: ''
 text_fenster: ''
